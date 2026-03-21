@@ -95,7 +95,7 @@ npm install
 
 Install additional packages you'll need
 ```bash
-npm install react-route-dom axios
+npm install react-route-dom axios @heroicons/react
 ```
 
 Install Tailwind for styling
