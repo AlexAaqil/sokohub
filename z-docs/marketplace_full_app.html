@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#fafaf8;--surface:#ffffff;--border:#e8e6e1;--border-light:#f0ede8;
+    --text:#1a1a18;--text-2:#6b6b67;--text-3:#a8a8a4;
+    --accent:#1a1a18;--accent-2:#f5f0e8;--green:#2d6a4f;--green-bg:#eaf4ef;
+    --orange:#c45c1a;--orange-bg:#fdf0e8;--red:#c0392b;
+    --radius:12px;--radius-sm:8px;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+    --font:'DM Sans',sans-serif;--font-serif:'DM Serif Display',serif;
+  }
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;overflow-x:hidden}
+
+  /* NAV */
+  .nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;height:56px;position:sticky;top:0;z-index:100;gap:8px}
+  .nav-logo{font-family:var(--font-serif);font-size:20px;color:var(--text);margin-right:16px;white-space:nowrap}
+  .nav-logo span{font-style:italic;color:var(--text-2)}
+  .nav-tabs{display:flex;gap:2px;flex:1}
+  .nav-tab{padding:6px 14px;border-radius:8px;border:none;background:none;font-family:var(--font);font-size:13px;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap}
+  .nav-tab:hover{background:var(--border-light);color:var(--text)}
+  .nav-tab.active{background:var(--text);color:#fff}
+  .nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .nav-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:13px;color:var(--text);cursor:pointer;transition:all .15s}
+  .nav-btn:hover{background:var(--border-light)}
+  .nav-btn.primary{background:var(--text);color:#fff;border-color:var(--text)}
+  .nav-btn.primary:hover{opacity:.88}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer}
+
+  /* SCREENS */
+  .screen{display:none;padding:24px;max-width:1100px;margin:0 auto;animation:fadeIn .2s ease}
+  .screen.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:box-shadow .15s}
+  .card:hover{box-shadow:var(--shadow)}
+
+  /* GRID */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+
+  /* BADGES */
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.02em}
+  .badge-green{background:var(--green-bg);color:var(--green)}
+  .badge-orange{background:var(--orange-bg);color:var(--orange)}
+  .badge-gray{background:var(--accent-2);color:var(--text-2)}
+
+  /* SECTION HEADER */
+  .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
+  .section-title{font-family:var(--font-serif);font-size:22px;font-weight:400}
+  .section-link{font-size:12px;color:var(--text-2);cursor:pointer;text-decoration:none;border-bottom:1px solid var(--border)}
+  .section-link:hover{color:var(--text)}
+
+  /* ===== SCREEN 1: STOREFRONT ===== */
+  .hero{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;position:relative}
+  .hero::before{content:'';position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:var(--accent-2);opacity:.6}
+  .hero-text{position:relative;z-index:1}
+  .hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;margin-bottom:10px}
+  .hero-title{font-family:var(--font-serif);font-size:38px;line-height:1.15;margin-bottom:14px;max-width:380px}
+  .hero-title em{font-style:italic;color:var(--text-2)}
+  .hero-sub{font-size:14px;color:var(--text-2);line-height:1.6;max-width:340px;margin-bottom:22px}
+  .hero-actions{display:flex;gap:10px}
+  .btn{padding:9px 20px;border-radius:9px;border:none;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+  .btn-dark{background:var(--text);color:#fff}
+  .btn-dark:hover{opacity:.85}
+  .btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+  .btn-outline:hover{background:var(--accent-2)}
+  .hero-stats{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+  .hero-stat{text-align:right}
+  .hero-stat .num{font-family:var(--font-serif);font-size:28px;font-weight:400}
+  .hero-stat .lbl{font-size:11px;color:var(--text-3)}
+
+  /* Search bar */
+  .search-bar{display:flex;gap:10px;margin-bottom:24px}
+  .search-input{flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:13px;background:var(--surface);color:var(--text);outline:none}
+  .search-input:focus{border-color:var(--text-2)}
+  .search-btn{padding:10px 20px;background:var(--text);color:#fff;border:none;border-radius:10px;font-family:var(--font);font-size:13px;cursor:pointer}
+
+  /* Category pills */
+  .cat-pills{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+  .cat-pill{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;transition:all .15s}
+  .cat-pill:hover,.cat-pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+  /* Shop card */
+  .shop-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .2s}
+  .shop-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .shop-card-cover{height:100px;display:flex;align-items:center;justify-content:center;font-size:36px}
+  .shop-card-body{padding:14px}
+  .shop-card-logo{width:40px;height:40px;border-radius:10px;margin-top:-28px;margin-bottom:8px;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--surface)}
+  .shop-card-name{font-weight:500;font-size:14px;margin-bottom:2px}
+  .shop-card-cat{font-size:11px;color:var(--text-3);margin-bottom:10px}
+  .shop-card-meta{display:flex;justify-content:space-between;align-items:center}
+  .shop-rating{font-size:12px;color:var(--text-2)}
+  .shop-rating span{color:#f59e0b}
+
+  /* ===== SCREEN 2: SHOP PROFILE ===== */
+  .shop-header{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+  .shop-header-top{display:flex;gap:18px;align-items:flex-start;margin-bottom:16px}
+  .shop-avatar-lg{width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;background:var(--accent-2);flex-shrink:0}
+  .shop-name{font-family:var(--font-serif);font-size:26px;margin-bottom:4px}
+  .shop-desc{font-size:13px;color:var(--text-2);line-height:1.6;max-width:500px}
+  .shop-stats-row{display:flex;gap:24px;padding-top:16px;border-top:1px solid var(--border-light)}
+  .shop-stat{text-align:center}
+  .shop-stat .n{font-weight:600;font-size:18px}
+  .shop-stat .l{font-size:11px;color:var(--text-3);margin-top:2px}
+
+  /* Product card */
+  .product-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .2s;cursor:pointer}
+  .product-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .product-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:44px;background:var(--accent-2)}
+  .product-body{padding:14px}
+  .product-name{font-weight:500;margin-bottom:4px;font-size:13px}
+  .product-price{display:flex;gap:8px;align-items:center}
+  .price-current{font-weight:600;font-size:15px}
+  .price-old{font-size:12px;color:var(--text-3);text-decoration:line-through}
+  .price-badge{font-size:10px;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:4px;font-weight:600}
+
+  /* ===== SCREEN 3: DEALS ===== */
+  .deals-banner{background:var(--text);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between}
+  .deals-banner-title{font-family:var(--font-serif);font-size:28px;font-style:italic}
+  .deals-banner-sub{font-size:13px;opacity:.6;margin-top:4px}
+  .countdown{display:flex;gap:12px}
+  .countdown-unit{text-align:center}
+  .countdown-num{font-size:24px;font-weight:600;line-height:1}
+  .countdown-lbl{font-size:10px;opacity:.5;letter-spacing:.05em}
+
+  .deal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:all .2s}
+  .deal-card:hover{box-shadow:var(--shadow)}
+  .deal-icon{width:54px;height:54px;border-radius:10px;background:var(--accent-2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+  .deal-info{flex:1}
+  .deal-name{font-weight:500;font-size:13px;margin-bottom:3px}
+  .deal-shop{font-size:11px;color:var(--text-3)}
+  .deal-right{text-align:right}
+  .deal-discount{font-size:18px;font-weight:700;color:var(--green)}
+  .deal-was{font-size:11px;color:var(--text-3)}
+
+  /* ===== SCREEN 4: SOCIAL ===== */
+  .social-layout{display:grid;grid-template-columns:1fr 300px;gap:20px}
+  .post-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+  .post-header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  .post-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0}
+  .post-meta{flex:1}
+  .post-author{font-weight:500;font-size:13px}
+  .post-time{font-size:11px;color:var(--text-3)}
+  .post-text{font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:12px}
+  .post-actions{display:flex;gap:16px}
+  .post-action{font-size:12px;color:var(--text-3);cursor:pointer;transition:color .15s}
+  .post-action:hover{color:var(--text)}
+
+  /* Chat */
+  .chat-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .chat-header{padding:14px 16px;border-bottom:1px solid var(--border);font-weight:500;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .chat-online{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:6px}
+  .chat-msgs{height:260px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:80%}
+  .msg-me{align-self:flex-end;background:var(--text);color:#fff;border-radius:12px 12px 2px 12px;padding:8px 12px;font-size:12px;line-height:1.5}
+  .msg-them{align-self:flex-start;background:var(--accent-2);color:var(--text);border-radius:12px 12px 12px 2px;padding:8px 12px;font-size:12px;line-height:1.5}
+  .msg-name{font-size:10px;color:var(--text-3);margin-bottom:3px}
+  .chat-input-row{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px}
+  .chat-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:12px;background:var(--bg);outline:none}
+  .chat-send{padding:8px 14px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer}
+
+  /* ===== SCREEN 5: DASHBOARD ===== */
+  .dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .dash-title{font-family:var(--font-serif);font-size:26px}
+  .dash-greeting{font-size:13px;color:var(--text-2);margin-top:2px}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+  .stat-label{font-size:11px;color:var(--text-3);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+  .stat-value{font-family:var(--font-serif);font-size:28px;margin-bottom:4px}
+  .stat-change{font-size:11px}
+  .stat-change.up{color:var(--green)}
+  .stat-change.dn{color:var(--red)}
+
+  /* Table */
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .table-title{font-weight:500;font-size:14px}
+  table{width:100%;border-collapse:collapse}
+  thead th{padding:10px 20px;text-align:left;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border-light)}
+  tbody td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border-light)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--bg)}
+
+  /* Form elements */
+  .form-group{margin-bottom:16px}
+  .form-label{font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:6px;display:block}
+  .form-input{width:100%;padding:9px 13px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;background:var(--bg);color:var(--text);outline:none}
+  .form-input:focus{border-color:var(--text-2);background:var(--surface)}
+
+  /* Mini chart */
+  .mini-chart{height:60px;display:flex;align-items:flex-end;gap:4px;margin-top:12px}
+  .bar{flex:1;border-radius:4px 4px 0 0;background:var(--border);transition:height .3s}
+  .bar.highlight{background:var(--text)}
+
+  /* Inventory */
+  .inv-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-light)}
+  .inv-item:last-child{border-bottom:none}
+  .inv-icon{width:36px;height:36px;border-radius:8px;background:var(--accent-2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .inv-name{font-weight:500;font-size:13px}
+  .inv-stock{font-size:11px;color:var(--text-3)}
+  .inv-bar-wrap{flex:1;height:4px;background:var(--border-light);border-radius:2px;overflow:hidden}
+  .inv-bar{height:100%;border-radius:2px;background:var(--green)}
+  .inv-bar.low{background:var(--orange)}
+
+  /* Tabs inside screens */
+  .inner-tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:-1px}
+  .inner-tab{padding:8px 14px;border:none;background:none;font-family:var(--font);font-size:13px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+  .inner-tab:hover{color:var(--text)}
+  .inner-tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:500}
+
+  .two-col{display:grid;grid-template-columns:1fr 320px;gap:20px}
+  .toggle-switch{position:relative;width:36px;height:20px;display:inline-block}
+  .toggle-switch input{opacity:0;width:0;height:0}
+  .toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+  .toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .toggle-switch input:checked + .toggle-slider{background:var(--text)}
+  .toggle-switch input:checked + .toggle-slider::before{transform:translateX(16px)}
+
+  /* Notification dot */
+  .notif-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block;margin-left:5px;vertical-align:middle}
+</style>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">Soko<span>hub</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="goTo('home')">Discover</button>
+    <button class="nav-tab" onclick="goTo('deals')">Deals & Offers</button>
+    <button class="nav-tab" onclick="goTo('social')">Community <span class="notif-dot"></span></button>
+    <button class="nav-tab" onclick="goTo('dashboard')">My Shop</button>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="goTo('dashboard')">+ List Product</button>
+    <div class="avatar">KM</div>
+  </div>
+</nav>
+
+<!-- ===== SCREEN: HOME ===== -->
+<div id="screen-home" class="screen active">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Kenya's Marketplace Network</div>
+      <div class="hero-title">Shop local.<br><em>Support bold</em><br>businesses.</div>
+      <div class="hero-sub">Discover curated shops, exclusive deals, and the people behind every product.</div>
+      <div class="hero-actions">
+        <button class="btn btn-dark" onclick="goTo('deals')">Browse Offers</button>
+        <button class="btn btn-outline" onclick="goTo('dashboard')">Open a Shop</button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">240+</div><div class="lbl">Active shops</div></div>
+      <div class="hero-stat"><div class="num">12k</div><div class="lbl">Products listed</div></div>
+      <div class="hero-stat"><div class="num">3.8k</div><div class="lbl">Daily shoppers</div></div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input class="search-input" placeholder="Search shops, products, categories…">
+    <button class="search-btn">Search</button>
+  </div>
+
+  <!-- Categories -->
+  <div class="cat-pills">
+    <div class="cat-pill active">All</div>
+    <div class="cat-pill">Fashion</div>
+    <div class="cat-pill">Electronics</div>
+    <div class="cat-pill">Food & Groceries</div>
+    <div class="cat-pill">Beauty</div>
+    <div class="cat-pill">Home & Living</div>
+    <div class="cat-pill">Health</div>
+    <div class="cat-pill">Art & Crafts</div>
+  </div>
+
+  <!-- Featured Shops -->
+  <div class="section-header">
+    <div class="section-title">Featured Shops</div>
+    <a class="section-link">View all →</a>
+  </div>
+  <div class="grid-4" style="margin-bottom:28px">
+    <div class="shop-card" onclick="goTo('shop')">
+      <div class="shop-card-cover" style="background:#f0ede8">🌿</div>
+      <div class="shop-card-body">
+        <div class="shop-card-logo" style="background:#eaf4ef">🌿</div>
+        <div class="shop-card-name">Amani Botanics</div>
+        <div class="shop-card-cat">Beauty & Wellness</div>
+        <div class="shop-card-meta">
+          <div class="shop-rating"><span>★</span> 4.9 · 312 reviews</div>
+          <span class="badge badge-green">Open</span>
+        </div>
+      </div>
+    </div>
+    <div class="shop-card" onclick="goTo('shop')">
+      <div class="shop-card-cover" style="background:#fdf0e8">👗</div>
+      <div class="shop-card-body">
+        <div class="shop-card-logo" style="background:#fdf0e8">👗</div>
+        <div class="shop-card-name">Zuri Threads</div>
+        <div class="shop-card-cat">Fashion & Style</div>
+        <div class="shop-card-meta">
+          <div class="shop-rating"><span>★</span> 4.7 · 187 reviews</div>
+          <span class="badge badge-green">Open</span>
+        </div>
+      </div>
+    </div>
+    <div class="shop-card" onclick="goTo('shop')">
+      <div class="shop-card-cover" style="background:#e8f0f8">📱</div>
+      <div class="shop-card-body">
+        <div class="shop-card-logo" style="background:#e8f0f8">📱</div>
+        <div class="shop-card-name">TechNairobi</div>
+        <div class="shop-card-cat">Electronics</div>
+        <div class="shop-card-meta">
+          <div class="shop-rating"><span>★</span> 4.8 · 524 reviews</div>
+          <span class="badge badge-gray">Busy</span>
+        </div>
+      </div>
+    </div>
+    <div class="shop-card" onclick="goTo('shop')">
+      <div class="shop-card-cover" style="background:#f5f0e8">🍯</div>
+      <div class="shop-card-body">
+        <div class="shop-card-logo" style="background:#f5f0e8">🍯</div>
+        <div class="shop-card-name">Mama's Pantry</div>
+        <div class="shop-card-cat">Food & Groceries</div>
+        <div class="shop-card-meta">
+          <div class="shop-rating"><span>★</span> 4.9 · 891 reviews</div>
+          <span class="badge badge-green">Open</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hot deals preview -->
+  <div class="section-header">
+    <div class="section-title">Hot Right Now</div>
+    <a class="section-link" onclick="goTo('deals')">See all deals →</a>
+  </div>
+  <div class="grid-3">
+    <div class="deal-card">
+      <div class="deal-icon">🧴</div>
+      <div class="deal-info">
+        <div class="deal-name">Aloe Vera Serum 50ml</div>
+        <div class="deal-shop">Amani Botanics</div>
+      </div>
+      <div class="deal-right">
+        <div class="deal-discount">40% OFF</div>
+        <div class="deal-was">Was KES 1,200</div>
+      </div>
+    </div>
+    <div class="deal-card">
+      <div class="deal-icon">👟</div>
+      <div class="deal-info">
+        <div class="deal-name">Ankara Sneakers</div>
+        <div class="deal-shop">Zuri Threads</div>
+      </div>
+      <div class="deal-right">
+        <div class="deal-discount">25% OFF</div>
+        <div class="deal-was">Was KES 4,500</div>
+      </div>
+    </div>
+    <div class="deal-card">
+      <div class="deal-icon">🍯</div>
+      <div class="deal-info">
+        <div class="deal-name">Pure Honey 500g</div>
+        <div class="deal-shop">Mama's Pantry</div>
+      </div>
+      <div class="deal-right">
+        <div class="deal-discount">15% OFF</div>
+        <div class="deal-was">Was KES 650</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: SHOP PROFILE ===== -->
+<div id="screen-shop" class="screen">
+  <div style="margin-bottom:14px"><button class="btn btn-outline" onclick="goTo('home')" style="font-size:12px;padding:6px 14px">← Back to Discover</button></div>
+  <div class="shop-header">
+    <div class="shop-header-top">
+      <div class="shop-avatar-lg">🌿</div>
+      <div>
+        <div class="shop-name">Amani Botanics</div>
+        <div style="margin:4px 0 8px;display:flex;gap:8px;align-items:center">
+          <span class="badge badge-green">Open Now</span>
+          <span class="badge badge-gray">Beauty & Wellness</span>
+        </div>
+        <div class="shop-desc">Handcrafted botanical skincare made from locally-sourced Kenyan ingredients. Every product is vegan, cruelty-free, and made in small batches for freshness.</div>
+      </div>
+    </div>
+    <div class="shop-stats-row">
+      <div class="shop-stat"><div class="n">312</div><div class="l">Reviews</div></div>
+      <div class="shop-stat"><div class="n">4.9★</div><div class="l">Rating</div></div>
+      <div class="shop-stat"><div class="n">48</div><div class="l">Products</div></div>
+      <div class="shop-stat"><div class="n">2.1k</div><div class="l">Sales</div></div>
+      <div class="shop-stat"><div class="n">98%</div><div class="l">Positive</div></div>
+    </div>
+  </div>
+
+  <div class="inner-tabs">
+    <button class="inner-tab active">All Products</button>
+    <button class="inner-tab">On Offer</button>
+    <button class="inner-tab">About</button>
+    <button class="inner-tab">Reviews</button>
+  </div>
+
+  <div class="grid-4">
+    <div class="product-card">
+      <div class="product-img">🧴</div>
+      <div class="product-body">
+        <div class="product-name">Aloe Vera Serum</div>
+        <div class="product-price">
+          <span class="price-current">KES 720</span>
+          <span class="price-old">KES 1,200</span>
+          <span class="price-badge">40%</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img">🌹</div>
+      <div class="product-body">
+        <div class="product-name">Rosehip Face Oil</div>
+        <div class="product-price"><span class="price-current">KES 1,850</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img">🧼</div>
+      <div class="product-body">
+        <div class="product-name">Shea Butter Soap</div>
+        <div class="product-price"><span class="price-current">KES 320</span></div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img">💧</div>
+      <div class="product-body">
+        <div class="product-name">Hydrating Toner</div>
+        <div class="product-price">
+          <span class="price-current">KES 890</span>
+          <span class="price-old">KES 1,100</span>
+          <span class="price-badge">19%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: DEALS ===== -->
+<div id="screen-deals" class="screen">
+  <div class="deals-banner">
+    <div>
+      <div class="deals-banner-title">Today's Best Deals</div>
+      <div class="deals-banner-sub">Fresh offers across all categories · Updated daily</div>
+    </div>
+    <div class="countdown">
+      <div class="countdown-unit"><div class="countdown-num" id="cd-h">08</div><div class="countdown-lbl">HRS</div></div>
+      <div class="countdown-unit" style="opacity:.4;font-size:20px;padding-top:4px">:</div>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-m">42</div><div class="countdown-lbl">MIN</div></div>
+      <div class="countdown-unit" style="opacity:.4;font-size:20px;padding-top:4px">:</div>
+      <div class="countdown-unit"><div class="countdown-num" id="cd-s">17</div><div class="countdown-lbl">SEC</div></div>
+    </div>
+  </div>
+
+  <div class="cat-pills" style="margin-bottom:20px">
+    <div class="cat-pill active">All</div>
+    <div class="cat-pill">Beauty</div>
+    <div class="cat-pill">Fashion</div>
+    <div class="cat-pill">Electronics</div>
+    <div class="cat-pill">Food</div>
+    <div class="cat-pill">Home</div>
+  </div>
+
+  <div class="section-header"><div class="section-title">Flash Offers</div><span class="badge badge-orange">12 active</span></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+    <div class="deal-card"><div class="deal-icon">🧴</div><div class="deal-info"><div class="deal-name">Aloe Vera Serum 50ml</div><div class="deal-shop">Amani Botanics · Beauty</div></div><div class="deal-right"><div class="deal-discount">40% OFF</div><div class="deal-was">KES 720 <s style="color:var(--text-3)">1,200</s></div></div></div>
+    <div class="deal-card"><div class="deal-icon">👟</div><div class="deal-info"><div class="deal-name">Ankara Print Sneakers</div><div class="deal-shop">Zuri Threads · Fashion</div></div><div class="deal-right"><div class="deal-discount">25% OFF</div><div class="deal-was">KES 3,375 <s style="color:var(--text-3)">4,500</s></div></div></div>
+    <div class="deal-card"><div class="deal-icon">📱</div><div class="deal-info"><div class="deal-name">Wireless Earbuds Pro</div><div class="deal-shop">TechNairobi · Electronics</div></div><div class="deal-right"><div class="deal-discount">30% OFF</div><div class="deal-was">KES 2,100 <s style="color:var(--text-3)">3,000</s></div></div></div>
+    <div class="deal-card"><div class="deal-icon">🍯</div><div class="deal-info"><div class="deal-name">Pure Wildflower Honey</div><div class="deal-shop">Mama's Pantry · Food</div></div><div class="deal-right"><div class="deal-discount">15% OFF</div><div class="deal-was">KES 552 <s style="color:var(--text-3)">650</s></div></div></div>
+    <div class="deal-card"><div class="deal-icon">🪴</div><div class="deal-info"><div class="deal-name">Indoor Succulent Set</div><div class="deal-shop">Green Corner · Home</div></div><div class="deal-right"><div class="deal-discount">20% OFF</div><div class="deal-was">KES 960 <s style="color:var(--text-3)">1,200</s></div></div></div>
+  </div>
+
+  <div class="section-header"><div class="section-title">Clearance</div></div>
+  <div class="grid-3">
+    <div class="product-card"><div class="product-img" style="background:#f5f0e8">🧦</div><div class="product-body"><div class="product-name">Kitenge Socks (3-pack)</div><div class="product-price"><span class="price-current">KES 280</span><span class="price-old">KES 580</span><span class="price-badge">52%</span></div></div></div>
+    <div class="product-card"><div class="product-img" style="background:#eaf4ef">🌸</div><div class="product-body"><div class="product-name">Hibiscus Body Scrub</div><div class="product-price"><span class="price-current">KES 490</span><span class="price-old">KES 850</span><span class="price-badge">42%</span></div></div></div>
+    <div class="product-card"><div class="product-img" style="background:#e8f0f8">🔌</div><div class="product-body"><div class="product-name">USB-C Hub 7-port</div><div class="product-price"><span class="price-current">KES 1,400</span><span class="price-old">KES 2,200</span><span class="price-badge">36%</span></div></div></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: SOCIAL ===== -->
+<div id="screen-social" class="screen">
+  <div class="section-header" style="margin-bottom:20px">
+    <div class="section-title">Business Community</div>
+    <button class="btn btn-dark" style="font-size:12px;padding:7px 16px">+ New Post</button>
+  </div>
+  <div class="social-layout">
+    <div>
+      <!-- Posts -->
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:#eaf4ef;color:#2d6a4f">AM</div>
+          <div class="post-meta">
+            <div class="post-author">Amani Botanics <span class="badge badge-green" style="margin-left:6px;font-size:10px">Verified</span></div>
+            <div class="post-time">2 hours ago · Beauty & Wellness</div>
+          </div>
+        </div>
+        <div class="post-text">Excited to announce our new <strong>Moringa Glow Collection</strong> launches this Friday! We've been formulating for 6 months. Early access for Sokohub community members — drop a 🌿 below and I'll DM you the link before it goes live.</div>
+        <div class="post-actions">
+          <span class="post-action">❤️ 47 Likes</span>
+          <span class="post-action">💬 23 Comments</span>
+          <span class="post-action">↗ Share</span>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:#fdf0e8;color:#c45c1a">ZT</div>
+          <div class="post-meta">
+            <div class="post-author">Zuri Threads</div>
+            <div class="post-time">5 hours ago · Fashion</div>
+          </div>
+        </div>
+        <div class="post-text">Any other fashion sellers here using local fabric suppliers in Gikomba? Looking to connect and possibly bulk-buy together. Logistics costs have been rough lately — would love to split shipping costs. DM me 🤝</div>
+        <div class="post-actions">
+          <span class="post-action">❤️ 31 Likes</span>
+          <span class="post-action">💬 18 Comments</span>
+          <span class="post-action">↗ Share</span>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:#e8f0f8;color:#185fa5">TN</div>
+          <div class="post-meta">
+            <div class="post-author">TechNairobi</div>
+            <div class="post-time">Yesterday · Electronics</div>
+          </div>
+        </div>
+        <div class="post-text">Quick tip for fellow electronics sellers: Always list your warranty terms clearly. I reduced return disputes by 60% just by adding a simple 3-line warranty statement to every product description. Customers trust you more. 📦</div>
+        <div class="post-actions">
+          <span class="post-action">❤️ 112 Likes</span>
+          <span class="post-action">💬 44 Comments</span>
+          <span class="post-action">↗ Share</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar: Chat & Who's online -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span><span class="chat-online"></span>Business Chat</span>
+          <span style="font-size:11px;color:var(--text-3)">24 online</span>
+        </div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="msg msg-them"><div class="msg-name">Zuri Threads</div>Anyone know a reliable courier in Mombasa?</div>
+          <div class="msg msg-them"><div class="msg-name">Mama's Pantry</div>Try Sendy! They've been great for us 🙌</div>
+          <div class="msg msg-me">Yes Sendy is solid. G4S also works for bulk.</div>
+          <div class="msg msg-them"><div class="msg-name">TechNairobi</div>Agreed on Sendy. Their API is handy too.</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-in" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="chat-send" onclick="sendMsg()">Send</button>
+        </div>
+      </div>
+
+      <!-- Online users -->
+      <div class="card" style="padding:16px">
+        <div style="font-weight:500;font-size:13px;margin-bottom:12px">Online Now</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><div class="post-avatar" style="width:30px;height:30px;font-size:11px;background:#eaf4ef;color:#2d6a4f">AM</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Amani Botanics</div><div style="font-size:10px;color:var(--text-3)">Beauty & Wellness</div></div><div style="width:7px;height:7px;border-radius:50%;background:#22c55e"></div></div>
+          <div style="display:flex;align-items:center;gap:10px"><div class="post-avatar" style="width:30px;height:30px;font-size:11px;background:#fdf0e8;color:#c45c1a">ZT</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Zuri Threads</div><div style="font-size:10px;color:var(--text-3)">Fashion</div></div><div style="width:7px;height:7px;border-radius:50%;background:#22c55e"></div></div>
+          <div style="display:flex;align-items:center;gap:10px"><div class="post-avatar" style="width:30px;height:30px;font-size:11px;background:#e8f0f8;color:#185fa5">TN</div><div style="flex:1"><div style="font-size:12px;font-weight:500">TechNairobi</div><div style="font-size:10px;color:var(--text-3)">Electronics</div></div><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: DASHBOARD ===== -->
+<div id="screen-dashboard" class="screen">
+  <div class="dash-header">
+    <div><div class="dash-title">My Shop Dashboard</div><div class="dash-greeting">Welcome back, Kamau · Amani Botanics</div></div>
+    <button class="btn btn-dark">+ Add Product</button>
+  </div>
+
+  <div class="inner-tabs" id="dash-tabs">
+    <button class="inner-tab active" onclick="showDashTab('overview',this)">Overview</button>
+    <button class="inner-tab" onclick="showDashTab('products',this)">Products</button>
+    <button class="inner-tab" onclick="showDashTab('inventory',this)">Inventory</button>
+    <button class="inner-tab" onclick="showDashTab('discounts',this)">Discounts</button>
+    <button class="inner-tab" onclick="showDashTab('analytics',this)">Analytics</button>
+  </div>
+
+  <!-- OVERVIEW TAB -->
+  <div id="dash-overview">
+    <div class="grid-4" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-label">Revenue (Mar)</div><div class="stat-value">KES 84,200</div><div class="stat-change up">↑ 18% vs last month</div></div>
+      <div class="stat-card"><div class="stat-label">Orders</div><div class="stat-value">147</div><div class="stat-change up">↑ 9 new today</div></div>
+      <div class="stat-card"><div class="stat-label">Products</div><div class="stat-value">48</div><div class="stat-change dn">↓ 3 low stock</div></div>
+      <div class="stat-card"><div class="stat-label">Shop Views</div><div class="stat-value">3,812</div><div class="stat-change up">↑ 22% this week</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Recent Orders</span><span class="badge badge-orange">5 pending</span></div>
+        <table><thead><tr><th>Order</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+          <tr><td>#1041</td><td>Aloe Vera Serum</td><td>KES 720</td><td><span class="badge badge-green">Paid</span></td></tr>
+          <tr><td>#1040</td><td>Rosehip Face Oil</td><td>KES 1,850</td><td><span class="badge badge-orange">Pending</span></td></tr>
+          <tr><td>#1039</td><td>Shea Butter Soap ×3</td><td>KES 960</td><td><span class="badge badge-green">Paid</span></td></tr>
+          <tr><td>#1038</td><td>Hydrating Toner</td><td>KES 890</td><td><span class="badge badge-green">Shipped</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px">Sales This Week</div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">KES 18,400 total</div>
+        <div class="mini-chart">
+          <div class="bar" style="height:35%"></div>
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:40%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar" style="height:60%"></div>
+          <div class="bar highlight" style="height:90%"></div>
+          <div class="bar highlight" style="height:75%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS TAB -->
+  <div id="dash-products" style="display:none">
+    <div class="two-col">
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">All Products</span><button class="btn btn-dark" style="font-size:12px;padding:6px 14px">+ Add New</button></div>
+        <table><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody>
+          <tr><td>🧴 Aloe Vera Serum</td><td>KES 720</td><td>34</td><td><span class="badge badge-green">Active</span></td><td style="cursor:pointer;color:var(--text-3)">✏️</td></tr>
+          <tr><td>🌹 Rosehip Face Oil</td><td>KES 1,850</td><td>12</td><td><span class="badge badge-green">Active</span></td><td style="cursor:pointer;color:var(--text-3)">✏️</td></tr>
+          <tr><td>🧼 Shea Butter Soap</td><td>KES 320</td><td>3</td><td><span class="badge badge-orange">Low Stock</span></td><td style="cursor:pointer;color:var(--text-3)">✏️</td></tr>
+          <tr><td>💧 Hydrating Toner</td><td>KES 890</td><td>0</td><td><span class="badge" style="background:#fde8e8;color:#c0392b">Out of Stock</span></td><td style="cursor:pointer;color:var(--text-3)">✏️</td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:16px">Quick Add Product</div>
+        <div class="form-group"><label class="form-label">Product name</label><input class="form-input" placeholder="e.g. Moringa Face Mask"></div>
+        <div class="form-group"><label class="form-label">Price (KES)</label><input class="form-input" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Category</label><input class="form-input" placeholder="e.g. Skincare"></div>
+        <div class="form-group"><label class="form-label">Stock quantity</label><input class="form-input" type="number" placeholder="0"></div>
+        <button class="btn btn-dark" style="width:100%">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY TAB -->
+  <div id="dash-inventory" style="display:none">
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px">Stock Levels</div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:16px">3 items need attention</div>
+        <div class="inv-item"><div class="inv-icon">🧴</div><div style="flex:1"><div class="inv-name">Aloe Vera Serum</div><div class="inv-stock">34 units · Restock at 10</div></div><div class="inv-bar-wrap"><div class="inv-bar" style="width:85%"></div></div></div>
+        <div class="inv-item"><div class="inv-icon">🌹</div><div style="flex:1"><div class="inv-name">Rosehip Face Oil</div><div class="inv-stock">12 units · Restock at 10</div></div><div class="inv-bar-wrap"><div class="inv-bar" style="width:40%"></div></div></div>
+        <div class="inv-item"><div class="inv-icon">🧼</div><div style="flex:1"><div class="inv-name">Shea Butter Soap</div><div class="inv-stock">3 units · ⚠️ Low</div></div><div class="inv-bar-wrap"><div class="inv-bar low" style="width:10%"></div></div></div>
+        <div class="inv-item"><div class="inv-icon">💧</div><div style="flex:1"><div class="inv-name">Hydrating Toner</div><div class="inv-stock">0 units · Out of stock</div></div><div class="inv-bar-wrap"><div class="inv-bar low" style="width:2%"></div></div></div>
+      </div>
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:16px">Update Stock</div>
+        <div class="form-group"><label class="form-label">Select product</label><input class="form-input" placeholder="Search product…"></div>
+        <div class="form-group"><label class="form-label">Add units</label><input class="form-input" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Restock alert threshold</label><input class="form-input" type="number" placeholder="10"></div>
+        <button class="btn btn-dark" style="width:100%">Update Inventory</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCOUNTS TAB -->
+  <div id="dash-discounts" style="display:none">
+    <div class="two-col">
+      <div>
+        <div class="table-wrap" style="margin-bottom:16px">
+          <div class="table-header"><span class="table-title">Active Discounts</span></div>
+          <table><thead><tr><th>Product</th><th>Discount</th><th>Ends</th><th>Visible</th></tr></thead><tbody>
+            <tr><td>🧴 Aloe Vera Serum</td><td><span class="badge badge-green">40% OFF</span></td><td>Mar 20</td><td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td></tr>
+            <tr><td>💧 Hydrating Toner</td><td><span class="badge badge-gray">19% OFF</span></td><td>Mar 18</td><td><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:16px">Create Discount</div>
+        <div class="form-group"><label class="form-label">Product</label><input class="form-input" placeholder="Search product…"></div>
+        <div class="form-group"><label class="form-label">Discount %</label><input class="form-input" type="number" placeholder="e.g. 20"></div>
+        <div class="form-group"><label class="form-label">Valid until</label><input class="form-input" type="date"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+          <span style="font-size:13px;color:var(--text-2)">Show on Deals page</span>
+        </div>
+        <button class="btn btn-dark" style="width:100%">Apply Discount</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS TAB -->
+  <div id="dash-analytics" style="display:none">
+    <div class="grid-4" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-label">Conversion Rate</div><div class="stat-value">3.8%</div><div class="stat-change up">↑ 0.4% this week</div></div>
+      <div class="stat-card"><div class="stat-label">Avg. Order Value</div><div class="stat-value">KES 572</div><div class="stat-change up">↑ KES 48</div></div>
+      <div class="stat-card"><div class="stat-label">Return Rate</div><div class="stat-value">1.2%</div><div class="stat-change up">↓ Improved</div></div>
+      <div class="stat-card"><div class="stat-label">New Followers</div><div class="stat-value">+84</div><div class="stat-change up">↑ This month</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px">Revenue — Last 6 Months</div>
+        <div class="mini-chart" style="height:80px;margin-top:16px;gap:6px">
+          <div class="bar" style="height:48%"></div>
+          <div class="bar" style="height:62%"></div>
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:78%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar highlight" style="height:95%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:6px">
+          <span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:500;font-size:14px;margin-bottom:14px">Top Products by Revenue</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Rosehip Face Oil</span><span style="font-weight:600">KES 22,200</span></div><div style="height:4px;border-radius:2px;background:var(--border-light)"><div style="height:100%;width:80%;border-radius:2px;background:var(--text)"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Aloe Vera Serum</span><span style="font-weight:600">KES 18,720</span></div><div style="height:4px;border-radius:2px;background:var(--border-light)"><div style="height:100%;width:68%;border-radius:2px;background:var(--text)"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Hydrating Toner</span><span style="font-weight:600">KES 14,240</span></div><div style="height:4px;border-radius:2px;background:var(--border-light)"><div style="height:100%;width:52%;border-radius:2px;background:var(--text)"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Shea Butter Soap</span><span style="font-weight:600">KES 9,600</span></div><div style="height:4px;border-radius:2px;background:var(--border-light)"><div style="height:100%;width:35%;border-radius:2px;background:var(--text)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Screen navigation
+  function goTo(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('screen-'+name).classList.add('active');
+    const map={home:0,deals:1,social:2,dashboard:3};
+    const tabs=document.querySelectorAll('.nav-tab');
+    if(map[name]!==undefined)tabs[map[name]].classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  // Dashboard inner tabs
+  function showDashTab(name,el){
+    ['overview','products','inventory','discounts','analytics'].forEach(t=>{
+      document.getElementById('dash-'+t).style.display=t===name?'block':'none';
+    });
+    document.querySelectorAll('#dash-tabs .inner-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Category pills
+  document.querySelectorAll('.cat-pill').forEach(p=>{
+    p.addEventListener('click',function(){
+      this.closest('.cat-pills').querySelectorAll('.cat-pill').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Inner tabs (shop profile)
+  document.querySelectorAll('.inner-tab:not(#dash-tabs .inner-tab)').forEach(t=>{
+    t.addEventListener('click',function(){
+      this.closest('.inner-tabs').querySelectorAll('.inner-tab').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Countdown timer
+  let secs=8*3600+42*60+17;
+  function tick(){
+    secs--;if(secs<0)secs=0;
+    const h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60),s=secs%60;
+    const pad=n=>String(n).padStart(2,'0');
+    const hEl=document.getElementById('cd-h'),mEl=document.getElementById('cd-m'),sEl=document.getElementById('cd-s');
+    if(hEl)hEl.textContent=pad(h);if(mEl)mEl.textContent=pad(m);if(sEl)sEl.textContent=pad(s);
+  }
+  setInterval(tick,1000);
+
+  // Chat
+  function sendMsg(){
+    const inp=document.getElementById('chat-in');
+    const txt=inp.value.trim();
+    if(!txt)return;
+    const msgs=document.getElementById('chat-msgs');
+    const div=document.createElement('div');
+    div.className='msg msg-me';div.textContent=txt;
+    msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+    inp.value='';
+  }
+</script>
