@@ -1,5 +1,5 @@
 # Phase 1: Environment Setup
-## 1. Install node.js and npm
+## 1.1 Install node.js and npm
 Node.js run JS on your server (backend).
 
 npm is like an app sotre for JS packages.
@@ -10,7 +10,7 @@ node --version
 npm --version
 ```
 
-## 2. Install PostgreSQL
+## 1.2 Install PostgreSQL
 Go to https://www.postgresql.org/download/linux/ubuntu/
 
 Follow Ubuntu instructions
@@ -46,6 +46,9 @@ Create your project database:
 ```bash
 # Still as postgres user, create the database
 sudo -u postgres createdb sokohub_db
+
+# Or
+sudo -u postgres psql -c "CREATE DATABASE sokohub_db;"
 ```
 
 Verify it worked:
@@ -58,10 +61,15 @@ sudo -u postgres psql -d sokohub_db
 # Exit with: \q
 ```
 
-## 3. Install VS Code extensions
-Thunder Client (By Ranga Vadhineni) : lets you test APIs without leaving VS Code
+Start PostgreSQL
+```bash
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
 
-PostgreSQL (by Chris Kolkman) : lets you run database queries directly
+## 1.3 Install VS Code extensions
+- Thunder Client (By Ranga Vadhineni) : lets you test APIs without leaving VS Code
+- PostgreSQL (by Chris Kolkman) : lets you run database queries directly
 
 
 # PHASE 2: Project Structure and Tooling
@@ -193,6 +201,49 @@ Replace the scripts sections with:
   "dev": "nodemon --exec ts-node src/index.ts",
   "build": "tsc",
   "clean": "rm -rf dist"
+}
+```
+
+At the top of the package.json file add shema to avoid any warnings from vscode:
+```json
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "backend-node-express",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/express-validator": "^2.20.33",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^25.5.0",
+    "@types/pg": "^8.20.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
 }
 ```
 
@@ -409,7 +460,7 @@ yarn-error.log*
 Thumbs.db
 ```
 
-Test the setup:
+## 2.6 Test the setup:
 ```bash
 npm run dev
 ```
@@ -452,3 +503,358 @@ Make the first commit
 ```bash
 git commit -m "Initial commit: Sokohub project setup with React + Express"
 ```
+
+# PHASE 3: Create Database Tables
+```sql
+-- ============================================
+-- USERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  full_name VARCHAR(120) NOT NULL,
+  email VARCHAR(200) UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  role VARCHAR(20) DEFAULT 'customer',
+  avatar_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- SHOPS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS shops (
+  id SERIAL PRIMARY KEY,
+  owner_id INT REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(150) NOT NULL,
+  description TEXT,
+  category VARCHAR(80),
+  logo_url TEXT,
+  cover_url TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- PRODUCTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS products (
+  id SERIAL PRIMARY KEY,
+  shop_id INT REFERENCES shops(id) ON DELETE CASCADE,
+  name VARCHAR(200) NOT NULL,
+  description TEXT,
+  price NUMERIC(12, 2) NOT NULL,
+  discount_pct INT DEFAULT 0,
+  is_on_offer BOOLEAN DEFAULT FALSE,
+  stock_qty INT DEFAULT 0,
+  image_url TEXT,
+  category VARCHAR(80),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- ORDERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS orders (
+  id SERIAL PRIMARY KEY,
+  customer_id INT REFERENCES users(id),
+  total_amount NUMERIC(12, 2) NOT NULL,
+  status VARCHAR(30) DEFAULT 'pending',
+  payment_method VARCHAR(20),
+  payment_status VARCHAR(20) DEFAULT 'unpaid',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- ORDER ITEMS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS order_items (
+  id SERIAL PRIMARY KEY,
+  order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+  product_id INT REFERENCES products(id),
+  quantity INT NOT NULL,
+  unit_price NUMERIC(12, 2) NOT NULL
+);
+
+-- ============================================
+-- SOCIAL POSTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS posts (
+  id SERIAL PRIMARY KEY,
+  shop_id INT REFERENCES shops(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  likes INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- REVIEWS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS reviews (
+  id SERIAL PRIMARY KEY,
+  shop_id INT REFERENCES shops(id) ON DELETE CASCADE,
+  user_id INT REFERENCES users(id),
+  rating INT CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+Connect to your db and run the SQL
+```bash
+sudo -u postgres psql -d sokohub_db -f server/src/db/init.sql
+```
+
+Or manually connect and paste the SQL commands
+```bash
+sudo -u postgres psql -d sokohub_db
+```
+
+# PHASE 4: User Authentication API
+This allows users to register and login, receiving JWT tokens to access protected routes.
+
+## 4.1 Create the Auth Middleware
+Create the middleware that protects routes by verifying JWT tokens.
+
+Create server/src/middleware/auth.ts:
+```ts
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: number;
+    role: string;
+  };
+}
+
+export const authMiddleware = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      id: number;
+      role: string;
+    };
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+```
+
+## 4.2 Create the Auth Controller
+Create server/src/controllers/authController.ts:
+```ts
+import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import pool from '../db';
+
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { full_name, email, password, role } = req.body;
+
+    // Check if user already exists
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ error: 'Email already registered' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create user
+    const result = await pool.query(
+      `INSERT INTO users (full_name, email, password, role) 
+       VALUES ($1, $2, $3, $4) 
+       RETURNING id, full_name, email, role, created_at`,
+      [full_name, email, hashedPassword, role || 'customer']
+    );
+
+    const user = result.rows[0];
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+        created_at: user.created_at
+      }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user
+    const result = await pool.query(
+      'SELECT id, full_name, email, password, role FROM users WHERE email = $1',
+      [email]
+    );
+
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
+
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+
+    res.json({
+      token,
+      user: userWithoutPassword
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    const result = await pool.query(
+      'SELECT id, full_name, email, role, avatar_url, created_at FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (!result.rows[0]) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Get current user error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+```
+
+## 4.3 Create the Auth Routes
+Create server/src/routes/auth.ts:
+```ts
+import { Router } from 'express';
+import { body } from 'express-validator';
+import { register, login, getCurrentUser } from '../controllers/authController';
+import { authMiddleware } from '../middleware/auth';
+
+const router = Router();
+
+// Validation rules
+const registerValidation = [
+  body('full_name').notEmpty().withMessage('Full name is required'),
+  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('role').optional().isIn(['customer', 'seller', 'admin']).withMessage('Invalid role')
+];
+
+const loginValidation = [
+  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('password').notEmpty().withMessage('Password is required')
+];
+
+// Routes
+router.post('/register', registerValidation, register);
+router.post('/login', loginValidation, login);
+router.get('/me', authMiddleware, getCurrentUser);
+
+export default router;
+```
+
+## 4.4 Update the Main Indes File
+Update server/src/index.ts to include the auth routes:
+```ts
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import './db'; // This runs the database connection test
+import authRoutes from './routes/auth';
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Sokohub API is running' });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📝 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔐 Auth: http://localhost:${PORT}/api/auth`);
+});
+```
+
+## 4.5 Test the Authentication API
+Test 1: Register a new user
+
+POST http://localhost:5000/api/auth/register
+
+Test 2: Login with the user
+
+POST http://localhost:5000/api/auth/login
+
+Test 3: Get current user (protected route)
+
+GET http://localhost:5000/api/auth/me
