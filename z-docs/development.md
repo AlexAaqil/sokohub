@@ -4,7 +4,7 @@ Node.js run JS on your server (backend).
 
 npm is like an app sotre for JS packages.
 
-Run these command to ensure successful isntallation.
+Run these command to ensure successful installation.
 ```bash
 node --version
 npm --version
@@ -103,7 +103,7 @@ Install Tailwind for styling
 npm install -D tailwindcss @tailwindcss/vite
 ```
 
-configure tailwind (client/vite.config.ts) by adding everything with:
+configure tailwind (`client/vite.config.ts`) by adding everything with:
 ```js
 import tailwindcss from '@tailwindcss/vite'
 export default defineConfig ({
@@ -113,7 +113,7 @@ export default defineConfig ({
 })
 ```
 
-Add tailwind to you css (client/src/index.css)
+Add tailwind to you css (`client/src/index.css`)
 ```css
 @import "tailwindcss";
 ```
@@ -123,7 +123,7 @@ Test that it all works.
 npm run dev
 ```
 
-It should run when you go to: http//localhost:5173
+It should run when you go to: `http//localhost:5173`
 
 ## 2.3 Scafold the Express Backend with TypeScript
 Go to the server folder and initialize a new Node.js project:
@@ -132,7 +132,7 @@ cd ../server
 npm init -y
 ```
 
-This creates package.json file with default values.
+This creates `package.json` file with default values.
 
 Install production dependencies (packages your app needs to run):
 ```bash
@@ -159,7 +159,7 @@ Create the TypeScript configuration
 npx tsc --init
 ```
 
-This create tsconfig.json which we then replace the contents with:
+This create `tsconfig.json` which we then replace the contents with:
 ```json
 {
   "compilerOptions": {
@@ -192,7 +192,7 @@ This create tsconfig.json which we then replace the contents with:
 }
 ```
 
-Update package.json scripts (server/package.json):
+Update package.json scripts (`server/package.json`):
 
 Replace the scripts sections with:
 ```js
@@ -204,7 +204,7 @@ Replace the scripts sections with:
 }
 ```
 
-At the top of the package.json file add shema to avoid any warnings from vscode:
+At the top of the `package.json` file add shema to avoid any warnings from vscode:
 ```json
 {
   "$schema": "https://json.schemastore.org/package.json",
@@ -257,9 +257,7 @@ This creates:
 - src/middleware/ - reusable functions (like auth checking)
 - src/controllers/ - business logic
 
-Create the main entry point - src/index.ts
-
-Add the initial code as:
+Create the main entry point `src/index.ts` and add the initial code as:
 ```ts
 import express from 'express';
 import cors from 'cors';
@@ -290,7 +288,7 @@ app.listen(PORT, () => {
 });
 ```
 
-Create the db connection - src/db/index.ts:
+Create the db connection `src/db/index.ts`:
 ```ts
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
@@ -314,9 +312,7 @@ pool.connect((err, client, release) => {
 export default pool;
 ```
 
-create the types - src/types/index.ts
-
-Add initial types as:
+create the types `src/types/index.ts` and add initial types as:
 ```ts
 export interface User {
   id: number;
@@ -433,7 +429,7 @@ MPESA_PASSKEY=placeholder
 MPESA_CALLBACK_URL=http://localhost:5000/api/payments/mpesa/callback
 ```
 
-Create a .gitignore file to protect secrets:
+Create a `.gitignore` file to protect secrets:
 ```bash
 touch .gitignore
 ```
@@ -474,13 +470,13 @@ curl http://localhost:5000/api/health
 
 You should see: {"status":"OK","message":"Sokohub API is running"}
 
-## 2.6 Initialize the git repository
+## 2.7 Initialize the git repository
 In the project root folder:
 ```bash
 git init
 ```
 
-Create a .gitignore for the root
+Create a `.gitignore` for the root
 ```
 # IDE
 .vscode/
@@ -615,7 +611,7 @@ This allows users to register and login, receiving JWT tokens to access protecte
 ## 4.1 Create the Auth Middleware
 Create the middleware that protects routes by verifying JWT tokens.
 
-Create server/src/middleware/auth.ts:
+Create `server/src/middleware/auth.ts`:
 ```ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -656,7 +652,7 @@ export const authMiddleware = (
 ```
 
 ## 4.2 Create the Auth Controller
-Create server/src/controllers/authController.ts:
+Create `server/src/controllers/authController.ts`:
 ```ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
@@ -778,7 +774,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 ```
 
 ## 4.3 Create the Auth Routes
-Create server/src/routes/auth.ts:
+Create `server/src/routes/auth.ts`:
 ```ts
 import { Router } from 'express';
 import { body } from 'express-validator';
@@ -809,7 +805,7 @@ export default router;
 ```
 
 ## 4.4 Update the Main Index File
-Update server/src/index.ts to include the auth routes:
+Update `server/src/index.ts` to include the auth routes:
 ```ts
 import express from 'express';
 import cors from 'cors';
@@ -847,24 +843,39 @@ app.listen(PORT, () => {
 ```
 
 ## 4.5 Test the Authentication API
-Test 1: Register a new user
+Using httpie
 
-POST http://localhost:5000/api/auth/register
+Test 1: Register a new user
+```bash
+http POST http://localhost:5000/api/auth/register full_name="Test User" email="test@gmail.com" password="pass" role="seller"
+```
+
 
 Test 2: Login with the user
-
-POST http://localhost:5000/api/auth/login
+```bash
+http POST http://localhost:5000/api/auth/login email="test@gmail.com" password="pass"
+```
 
 Test 3: Get current user (protected route)
-
-GET http://localhost:5000/api/auth/me
+```bash
+http GET http://localhost:5000/api/auth/me Authorization:"Bearer YOUR_TOKEN"
+```
 
 
 # PHASE 5: Shop CRUD API (Shop-First Core Feature)
 The shop endpoints
 
+| Endpoint | Method | Test Result |
+|----------|--------|-------------|
+| `POST /api/shops` | Create shop | Created 2 shops successfully |
+| `GET /api/shops` | Get all shops | Returns all active shops |
+| `GET /api/shops/my/shops` | Get my shops | Returns user's shops |
+| `GET /api/shops/:id` | Get shop by ID | Returns shop details |
+| `PUT /api/shops/:id` | Update shop | Updated name/description |
+| `DELETE /api/shops/:id` | Delete shop | Deleted shop ID 2 successfully |
+
 ## 5.1 Create the Shop Controller
-Create server/src/controllers/shopController.ts
+Create `server/src/controllers/shopController.ts`
 ```ts
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
@@ -1024,7 +1035,7 @@ export const deleteShop = async (req: AuthRequest, res: Response) => {
 ```
 
 ## 5.2 Create the Shop Routes
-Create server/src/routes/shops.ts
+Create `server/src/routes/shops.ts`
 ```ts
 import { Router } from 'express';
 import { body } from 'express-validator';
@@ -1062,7 +1073,7 @@ export default router;
 
 
 ## 5.3 Update the Main Index File
-Update server/src/index.ts to include shop routes:
+Update `server/src/index.ts` to include shop routes:
 ```ts
 import express from 'express';
 import cors from 'cors';
@@ -1100,14 +1111,355 @@ app.listen(PORT, () => {
 
 ## 5.4 Test the Shop API
 Test 1: Create a shop (requires auth token)
-POST http://localhost:5000/api/shops
+```bash
+http POST http://localhost:5000/api/shops Authorization:"Bearer YOUR_TOKEN" name="Test Shop" description="lorem ipsum" category="test"
+```
 
 Test 2: Get all shops
-GET http://localhost:5000/api/shops
+```bash
+http GET http://localhost:5000/api/shops
+```
 
 Test 3: Get your shops
-GET http://localhost:5000/api/shops/my/shops
+```bash
+http GET http://localhost:5000/api/shops/my/shops Authorization:"Bearer YOUR_TOKEN"
+```
 
 Test 4: Get a specific shop
-GET http://localhost:5000/api/shops/1
+```bash
+http GET http://localhost:5000/api/shops/1
+```
 
+Test 5: Update a shop
+```bash
+http PUT http://localhost:5000/api/shops/1 Authorization:"Bearer YOUR_TOKEN" name="Amani Botanics Updated" description="Premium handcrafted skincare"
+```
+
+Test 6: Delete a shop
+```bash
+http DELETE http://localhost:5000/api/shops/2 Authorization:"Bearer YOUR_TOKEN"
+```
+
+# PHASE 6: Product CRUD API
+Product endpoints.
+
+Product will be linked to shops.
+
+| Endpoint | Method | Test Result |
+|----------|--------|-------------|
+| **Create** |
+| `POST /api/products` | Create product | Created product ID 1 |
+| **Read** |
+| `GET /api/products` | Get all products | Returns all products |
+| `GET /api/products/shop/1` | Get products by shop | Returns shop's products |
+| `GET /api/products/1` | Get product by ID | Returns product with shop details |
+| **Update** |
+| `PUT /api/products/1` | Update product | Updated price and stock |
+| **Delete** |
+| `DELETE /api/products/2` | Delete product | Deleted test product |
+
+## 6.1 Create the Product Controller
+Create `server/src/controllers/productController.ts`
+```ts
+import { Request, Response } from 'express';
+import { AuthRequest } from '../middleware/auth';
+import pool from '../db';
+
+export const createProduct = async (req: AuthRequest, res: Response) => {
+  try {
+    const { shop_id, name, description, price, discount_pct, is_on_offer, stock_qty, image_url, category } = req.body;
+    const user_id = req.user?.id;
+
+    // Verify user owns the shop
+    const shopCheck = await pool.query(
+      'SELECT owner_id FROM shops WHERE id = $1',
+      [shop_id]
+    );
+
+    if (shopCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Shop not found' });
+    }
+
+    if (shopCheck.rows[0].owner_id !== user_id) {
+      return res.status(403).json({ error: 'Not authorized to add products to this shop' });
+    }
+
+    if (!name) {
+      return res.status(400).json({ error: 'Product name is required' });
+    }
+
+    if (!price || price <= 0) {
+      return res.status(400).json({ error: 'Valid price is required' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO products (shop_id, name, description, price, discount_pct, is_on_offer, stock_qty, image_url, category)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING *`,
+      [shop_id, name, description, price, discount_pct || 0, is_on_offer || false, stock_qty || 0, image_url, category]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Create product error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getAllProducts = async (req: Request, res: Response) => {
+  try {
+    const { shop_id, category, on_offer, search } = req.query;
+    let query = 'SELECT * FROM products WHERE 1=1';
+    const params: any[] = [];
+
+    if (shop_id) {
+      params.push(shop_id);
+      query += ` AND shop_id = $${params.length}`;
+    }
+
+    if (category) {
+      params.push(category);
+      query += ` AND category = $${params.length}`;
+    }
+
+    if (on_offer === 'true') {
+      query += ` AND is_on_offer = true`;
+    }
+
+    if (search) {
+      params.push(`%${search}%`);
+      query += ` AND name ILIKE $${params.length}`;
+    }
+
+    query += ' ORDER BY created_at DESC';
+    
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get all products error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getProductsByShop = async (req: Request, res: Response) => {
+  try {
+    const { shopId } = req.params;
+    const result = await pool.query(
+      'SELECT * FROM products WHERE shop_id = $1 ORDER BY created_at DESC',
+      [shopId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get products by shop error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `SELECT p.*, s.name as shop_name, s.owner_id
+       FROM products p
+       LEFT JOIN shops s ON p.shop_id = s.id
+       WHERE p.id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Get product by id error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const updateProduct = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, discount_pct, is_on_offer, stock_qty, image_url, category } = req.body;
+    const user_id = req.user?.id;
+
+    // Verify user owns the shop that owns this product
+    const productCheck = await pool.query(
+      `SELECT p.*, s.owner_id 
+       FROM products p
+       JOIN shops s ON p.shop_id = s.id
+       WHERE p.id = $1`,
+      [id]
+    );
+
+    if (productCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    if (productCheck.rows[0].owner_id !== user_id) {
+      return res.status(403).json({ error: 'Not authorized to update this product' });
+    }
+
+    const result = await pool.query(
+      `UPDATE products 
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           price = COALESCE($3, price),
+           discount_pct = COALESCE($4, discount_pct),
+           is_on_offer = COALESCE($5, is_on_offer),
+           stock_qty = COALESCE($6, stock_qty),
+           image_url = COALESCE($7, image_url),
+           category = COALESCE($8, category)
+       WHERE id = $9
+       RETURNING *`,
+      [name, description, price, discount_pct, is_on_offer, stock_qty, image_url, category, id]
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Update product error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteProduct = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user?.id;
+
+    // Verify user owns the shop that owns this product
+    const productCheck = await pool.query(
+      `SELECT p.*, s.owner_id 
+       FROM products p
+       JOIN shops s ON p.shop_id = s.id
+       WHERE p.id = $1`,
+      [id]
+    );
+
+    if (productCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    if (productCheck.rows[0].owner_id !== user_id) {
+      return res.status(403).json({ error: 'Not authorized to delete this product' });
+    }
+
+    await pool.query('DELETE FROM products WHERE id = $1', [id]);
+
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error('Delete product error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+```
+
+## 6.2 Create the Product Routes
+Create `server/src/routes/products.ts`
+```ts
+import { Router } from 'express';
+import { body } from 'express-validator';
+import { authMiddleware } from '../middleware/auth';
+import {
+  createProduct,
+  getAllProducts,
+  getProductsByShop,
+  getProductById,
+  updateProduct,
+  deleteProduct
+} from '../controllers/productController';
+
+const router = Router();
+
+// Validation rules
+const createProductValidation = [
+  body('shop_id').isInt().withMessage('Shop ID is required'),
+  body('name').notEmpty().withMessage('Product name is required'),
+  body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+  body('discount_pct').optional().isInt({ min: 0, max: 100 }).withMessage('Discount must be between 0 and 100'),
+  body('stock_qty').optional().isInt({ min: 0 }).withMessage('Stock quantity must be a non-negative integer')
+];
+
+// Public routes
+router.get('/', getAllProducts);
+router.get('/shop/:shopId', getProductsByShop);
+router.get('/:id', getProductById);
+
+// Protected routes (require authentication)
+router.post('/', authMiddleware, createProductValidation, createProduct);
+router.put('/:id', authMiddleware, updateProduct);
+router.delete('/:id', authMiddleware, deleteProduct);
+
+export default router;
+```
+
+## 6.3 Update the Main Index File
+Update the main index file to include product routes.
+```ts
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import './db';
+import authRoutes from './routes/auth';
+import shopRoutes from './routes/shops';
+import productRoutes from './routes/products'; // Add this
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/shops', shopRoutes);
+app.use('/api/products', productRoutes); // Add this
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Sokohub API is running' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📝 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔐 Auth: http://localhost:${PORT}/api/auth`);
+  console.log(`🏪 Shops: http://localhost:${PORT}/api/shops`);
+  console.log(`📦 Products: http://localhost:${PORT}/api/products`);
+});
+```
+
+## 6.4 Test the Product API
+Test 1: Create a product (use your shop_id = 1)
+```bash
+http POST http://localhost:5000/api/products Authorization:"Bearer YOUR_TOKEN" shop_id=1 name="Aloe Vera Serum" description="Hydrating serum with pure aloe vera" price=720 discount_pct=40 stock_qty=34 category="Skincare"
+```
+
+Test 2: Get all products
+```bash
+http GET http://localhost:5000/api/products
+```
+
+Test 3: Get products by shop
+```bash
+http GET http://localhost:5000/api/products/shop/1
+```
+
+Test 4: Get single product
+```bash
+http GET http://localhost:5000/api/products/1
+```
+
+Test 5: Update a product
+```bash
+http PUT http://localhost:5000/api/products/1 Authorization:"Bearer YOUR_TOKEN" price=680 stock_qty=28
+```
+
+Test 6: Delete a product
+```bash
+http DELETE http://localhost:5000/api/products/1 Authorization:"Bearer YOUR_TOKEN"
+```
