@@ -22,7 +22,8 @@
     "skipLibCheck": true,
     
     /* Other */
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
