@@ -14,6 +14,11 @@ export interface Product {
   created_at: string;
 }
 
+export interface ProductWithShop extends Product {
+  shop_name: string;
+  shop_id: number;
+}
+
 export const productAPI = {
   // Get all products (public)
   getAll: async (params?: { shop_id?: number; category?: string; on_offer?: boolean; search?: string }) => {
@@ -25,6 +30,12 @@ export const productAPI = {
   getByShop: async (shopId: number) => {
     const response = await api.get(`/products/shop/${shopId}`);
     return response.data;
+  },
+
+  // Get deals (products on offer filtered by type: 'flash' or 'clearance')
+  getDeals: async (params?: { category?: string; type?: 'flash' | 'clearance' }) => {
+    const response = await api.get('/products/deals', { params });
+    return response.data as ProductWithShop[];
   },
 
   // Get a single product

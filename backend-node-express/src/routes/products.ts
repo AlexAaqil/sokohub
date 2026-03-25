@@ -7,7 +7,8 @@ import {
   getProductsByShop,
   getProductById,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getDeals
 } from '../controllers/productController';
 
 const router = Router();
@@ -24,6 +25,7 @@ const createProductValidation = [
 // Public routes
 router.get('/', getAllProducts);
 router.get('/shop/:shopId', getProductsByShop);
+router.get('/deals', getDeals);
 router.get('/:id', getProductById);
 
 // Protected routes (require authentication)

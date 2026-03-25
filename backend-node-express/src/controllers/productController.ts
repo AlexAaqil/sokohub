@@ -189,3 +189,38 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const getDeals = async (req: Request, res: Response) => {
+  try {
+    const { category, type } = req.query;
+    
+    let query = `
+      SELECT p.*, s.name as shop_name, s.id as shop_id
+      FROM products p
+      JOIN shops s ON p.shop_id = s.id
+      WHERE (p.is_on_offer = true OR p.discount_pct > 0)
+      AND p.stock_qty > 0
+    `;
+    const params: any[] = [];
+
+    // Filter by deal type
+    if (type === 'flash') {
+      query += ` AND p.discount_pct >= 30`;
+    } else if (type === 'clearance') {
+      query += ` AND p.discount_pct < 30 AND p.discount_pct > 0`;
+    }
+
+    if (category && category !== 'All') {
+      params.push(category);
+      query += ` AND p.category = $${params.length}`;
+    }
+
+    query += ' ORDER BY p.discount_pct DESC, p.created_at DESC';
+    
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get deals error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
