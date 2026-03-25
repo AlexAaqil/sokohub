@@ -6,10 +6,8 @@ import { ShopPage } from './pages/ShopPage';
 import { DealsPage } from './pages/DealsPage';
 import Login from './pages/AuthPages/Login';
 import Register from './pages/AuthPages/Register';
-// import { ShopPage } from './pages/ShopPage';
-// import { DealsPage } from './pages/DealsPage';
+import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 // import { SocialPage } from './pages/SocialPage';
-// import { DashboardPage } from './pages/DashboardPage';
 // import { NotFoundPage } from './pages/NotFoundPage';
 
 function App() {
@@ -25,8 +23,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/shop/:id" element={<ShopPage />} />
               <Route path="/deals" element={<DealsPage />} />
-              {/* <Route path="/social" element={<SocialPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              {/* <Route path="/social" element={<SocialPage />} />
               <Route path="*" element={<NotFoundPage />} /> */}
             </Routes>
           </main>
