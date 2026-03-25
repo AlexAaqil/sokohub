@@ -33,3 +33,30 @@ export interface Product {
   category?: string;
   created_at: Date;
 }
+
+export interface Order {
+  id: number;
+  customer_id: number;
+  total_amount: number;
+  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  payment_method: 'mpesa' | 'card' | null;
+  payment_status: 'unpaid' | 'paid' | 'failed' | 'refunded';
+  created_at: Date;
+}
+
+export interface OrderItem {
+  id: number;
+  order_id: number;
+  product_id: number;
+  quantity: number;
+  unit_price: number;
+  created_at: Date;
+}
+
+export interface CreateOrderInput {
+  items: {
+    product_id: number;
+    quantity: number;
+  }[];
+  payment_method?: 'mpesa' | 'card';
+}

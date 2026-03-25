@@ -5,6 +5,7 @@ import './db';
 import authRoutes from './routes/auth';
 import shopRoutes from './routes/shops';
 import productRoutes from './routes/products';
+import orderRoutes from './routes/orders';
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -36,4 +38,5 @@ app.listen(PORT, () => {
   console.log(`🔐 Auth: http://localhost:${PORT}/api/auth`);
   console.log(`🏪 Shops: http://localhost:${PORT}/api/shops`);
   console.log(`📦 Products: http://localhost:${PORT}/api/products`);
+  console.log(`📋 Orders: http://localhost:${PORT}/api/orders`);
 });
