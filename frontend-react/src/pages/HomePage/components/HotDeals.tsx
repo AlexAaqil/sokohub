@@ -52,9 +52,9 @@ export const HotDeals = ({ onDealClick }: HotDealsProps) => {
   };
 
   return (
-    <div>
+    <div className="mt-6">
       <div className="flex items-baseline justify-between mb-4">
-        <h2 className="font-serif text-2xl font-normal">Hot Right Now</h2>
+        <h2 className="text-xl font-serif font-semibold">Hot Right Now</h2>
         <button 
           onClick={() => onDealClick?.('all')}
           className="text-xs text-gray-500 hover:text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-colors"

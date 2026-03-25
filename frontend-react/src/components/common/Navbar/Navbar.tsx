@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HomeIcon, FireIcon, ChatBubbleLeftIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../../context/AuthContext';
+import { Logo } from '../Logo/Logo';
 
 export const Navbar = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -24,9 +25,7 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link to="/" className="font-serif text-xl">
-            Soko<span className="text-gray-500 italic">hub</span>
-          </Link>
+          <Logo />
 
           {/* Tabs */}
           <div className="flex gap-1">

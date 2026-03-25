@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/common/Navbar/Navbar';
 import { HomePage } from './pages/HomePage';
+import { ShopPage } from './pages/ShopPage';
 import Login from './pages/AuthPages/Login';
 import Register from './pages/AuthPages/Register';
 // import { ShopPage } from './pages/ShopPage';
@@ -21,8 +22,8 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              {/* <Route path="/shop/:id" element={<ShopPage />} />
-              <Route path="/deals" element={<DealsPage />} />
+              <Route path="/shop/:id" element={<ShopPage />} />
+              {/* <Route path="/deals" element={<DealsPage />} />
               <Route path="/social" element={<SocialPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="*" element={<NotFoundPage />} /> */}

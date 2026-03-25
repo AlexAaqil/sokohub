@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { statsAPI, Stats } from '../../../api/stats';
+import { config } from '../../../config';
 
 export const Hero = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export const Hero = () => {
     <div className="bg-white border border-gray-200 rounded-2xl p-10 mb-6 relative overflow-hidden">
       <div className="relative z-10">
         <div className="text-xs font-medium tracking-wider text-gray-400 uppercase mb-2.5">
-          Kenya's Marketplace Network
+          {config.appDescription}
         </div>
         <h1 className="font-serif text-4xl leading-tight mb-3.5 max-w-md">
           Shop local.<br />
