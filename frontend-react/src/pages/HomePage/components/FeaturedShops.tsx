@@ -1,92 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { shopAPI, Shop } from '../../../api/shops';
 
-interface Shop {
-  id: string;
-  name: string;
-  category: string;
-  logo: string;
-  coverColor: string;
-  logoBg: string;
-  rating: number;
-  reviews: number;
-  status: 'open' | 'busy';
-}
+export const FeaturedShops = () => {
+  const [shops, setShops] = useState<Shop[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-interface FeaturedShopsProps {
-  onShopClick?: (shopId: string) => void;
-  isLoading?: boolean;
-}
+  useEffect(() => {
+    const fetchShops = async () => {
+      try {
+        const data = await shopAPI.getAll();
+        setShops(data);
+      } catch (error) {
+        console.error('Failed to fetch shops:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-const featuredShops: Shop[] = [
-  {
-    id: '1',
-    name: 'Amani Botanics',
-    category: 'Beauty & Wellness',
-    logo: '🌿',
-    coverColor: 'bg-[#f0ede8]',
-    logoBg: 'bg-[#eaf4ef]',
-    rating: 4.9,
-    reviews: 312,
-    status: 'open'
-  },
-  {
-    id: '2',
-    name: 'Zuri Threads',
-    category: 'Fashion & Style',
-    logo: '👗',
-    coverColor: 'bg-[#fdf0e8]',
-    logoBg: 'bg-[#fdf0e8]',
-    rating: 4.7,
-    reviews: 187,
-    status: 'open'
-  },
-  {
-    id: '3',
-    name: 'TechNairobi',
-    category: 'Electronics',
-    logo: '📱',
-    coverColor: 'bg-[#e8f0f8]',
-    logoBg: 'bg-[#e8f0f8]',
-    rating: 4.8,
-    reviews: 524,
-    status: 'busy'
-  },
-  {
-    id: '4',
-    name: "Mama's Pantry",
-    category: 'Food & Groceries',
-    logo: '🍯',
-    coverColor: 'bg-[#f5f0e8]',
-    logoBg: 'bg-[#f5f0e8]',
-    rating: 4.9,
-    reviews: 891,
-    status: 'open'
-  }
-];
+    fetchShops();
+  }, []);
 
-export const FeaturedShops = ({ onShopClick, isLoading = false }: FeaturedShopsProps) => {
-  const [hoveredShop, setHoveredShop] = useState<string | null>(null);
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="mb-7">
-        <div className="flex items-baseline justify-between mb-4">
-          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+      <div className="mt-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-serif font-semibold">Featured Shops</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <div className="h-24 bg-gray-200 animate-pulse" />
-              <div className="p-3.5">
-                <div className="w-10 h-10 rounded-xl -mt-6 mb-2 bg-gray-200 animate-pulse" />
-                <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse mb-1" />
-                <div className="h-3 w-1/2 bg-gray-200 rounded animate-pulse mb-2" />
-                <div className="flex justify-between">
-                  <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-5 w-12 bg-gray-200 rounded animate-pulse" />
-                </div>
-              </div>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 animate-pulse">
+              <div className="h-24 bg-gray-200 rounded-lg mb-3" />
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
             </div>
           ))}
         </div>
@@ -94,55 +41,47 @@ export const FeaturedShops = ({ onShopClick, isLoading = false }: FeaturedShopsP
     );
   }
 
+  if (shops.length === 0) {
+    return (
+      <div className="mt-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-serif font-semibold">Featured Shops</h2>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
+          No shops yet. Be the first to create one!
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="mb-7">
-      <div className="flex items-baseline justify-between mb-4">
-        <h2 className="font-serif text-2xl font-normal">Featured Shops</h2>
-        <button className="text-xs text-gray-500 hover:text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-colors">
+    <div className="mt-8">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-serif font-semibold">Featured Shops</h2>
+        <button className="text-sm text-gray-500 hover:text-gray-700">
           View all →
         </button>
       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {featuredShops.map((shop) => (
+        {shops.map(shop => (
           <div
             key={shop.id}
-            onClick={() => onShopClick?.(shop.id)}
-            onMouseEnter={() => setHoveredShop(shop.id)}
-            onMouseLeave={() => setHoveredShop(null)}
-            className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+            onClick={() => navigate(`/shop/${shop.id}`)}
+            className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
           >
-            {/* Cover Image */}
-            <div className={`h-24 flex items-center justify-center text-4xl ${shop.coverColor}`}>
-              {shop.logo}
+            <div className="h-24 bg-gray-100 flex items-center justify-center text-3xl">
+              {shop.logo_url ? (
+                <img src={shop.logo_url} alt={shop.name} className="h-full w-full object-cover" />
+              ) : (
+                <span>🏪</span>
+              )}
             </div>
-
-            {/* Body */}
-            <div className="p-3.5">
-              {/* Logo */}
-              <div className={`w-10 h-10 rounded-xl -mt-6 mb-2 flex items-center justify-center text-lg border-2 border-white ${shop.logoBg}`}>
-                {shop.logo}
-              </div>
-
-              {/* Info */}
-              <h3 className="font-medium text-sm mb-0.5">{shop.name}</h3>
-              <p className="text-xs text-gray-400 mb-2.5">{shop.category}</p>
-
-              {/* Meta */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-xs text-gray-500">
-                  <span className="text-amber-500">★</span>
-                  <span>{shop.rating}</span>
-                  <span className="text-gray-400">·</span>
-                  <span>{shop.reviews} reviews</span>
-                </div>
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                  shop.status === 'open' 
-                    ? 'bg-green-50 text-green-700' 
-                    : 'bg-gray-100 text-gray-600'
-                }`}>
-                  {shop.status === 'open' ? 'Open' : 'Busy'}
-                </span>
+            <div className="p-3">
+              <h3 className="font-medium text-gray-900">{shop.name}</h3>
+              <p className="text-xs text-gray-500 mt-1">{shop.category || 'General'}</p>
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-xs text-green-600">Open</span>
+                <span className="text-xs text-gray-400">★ 4.8</span>
               </div>
             </div>
           </div>

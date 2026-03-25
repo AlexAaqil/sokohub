@@ -1,6 +1,37 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { statsAPI, Stats } from '../../../api/stats';
+
 export const Hero = () => {
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await statsAPI.getStats();
+        setStats(data);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // Format number with K suffix if needed
+  const formatNumber = (num: number): string => {
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}k`;
+    }
+    return num.toString();
+  };
+
   return (
-    <div className="border border-gray-200 rounded-2xl p-10 mb-6 relative overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-2xl p-10 mb-6 relative overflow-hidden">
       <div className="relative z-10">
         <div className="text-xs font-medium tracking-wider text-gray-400 uppercase mb-2.5">
           Kenya's Marketplace Network
@@ -14,10 +45,16 @@ export const Hero = () => {
           Discover curated shops, exclusive deals, and the people behind every product.
         </p>
         <div className="flex gap-2.5">
-          <button className="px-5 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:opacity-90">
+          <button
+            onClick={() => navigate('/deals')}
+            className="px-5 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:opacity-90"
+          >
             Browse Offers
           </button>
-          <button className="px-5 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="px-5 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
             Open a Shop
           </button>
         </div>
@@ -25,18 +62,38 @@ export const Hero = () => {
 
       {/* Stats */}
       <div className="absolute right-10 top-1/2 -translate-y-1/2 z-10">
-        <div className="text-right">
-          <div className="text-3xl font-serif">240+</div>
-          <div className="text-xs text-gray-400">Active shops</div>
-        </div>
-        <div className="text-right mt-3.5">
-          <div className="text-3xl font-serif">12k</div>
-          <div className="text-xs text-gray-400">Products listed</div>
-        </div>
-        <div className="text-right mt-3.5">
-          <div className="text-3xl font-serif">3.8k</div>
-          <div className="text-xs text-gray-400">Daily shoppers</div>
-        </div>
+        {loading ? (
+          // Skeleton loader
+          <>
+            <div className="text-right">
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 w-12 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="text-right mt-3.5">
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 w-12 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="text-right mt-3.5">
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 w-12 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-right">
+              <div className="text-3xl font-serif">{formatNumber(stats?.active_shops || 0)}+</div>
+              <div className="text-xs text-gray-400">Active shops</div>
+            </div>
+            <div className="text-right mt-3.5">
+              <div className="text-3xl font-serif">{formatNumber(stats?.total_products || 0)}+</div>
+              <div className="text-xs text-gray-400">Products listed</div>
+            </div>
+            <div className="text-right mt-3.5">
+              <div className="text-3xl font-serif">{formatNumber(stats?.daily_shoppers || 0)}+</div>
+              <div className="text-xs text-gray-400">Daily shoppers</div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Decorative circle */}

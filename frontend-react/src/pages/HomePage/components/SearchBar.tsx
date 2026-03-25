@@ -1,15 +1,32 @@
-export const SearchBar = () => {
-  return (
-    <div className="flex gap-2.5 mb-6">
-        <div className="flex-1">
-            <input 
-                type="text" 
-                placeholder="Search shops, products, categories..." className="w-full px-4 py-2.5 rounded-xl bg-white text-gray-900 text-sm outline-none border border-gray-200 focus:border-gray-400" />
-        </div>
+import { useState } from 'react';
 
-        <div>
-            <button className="px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:opacity-90">Search</button>
-        </div>
-    </div>
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+export const SearchBar = ({ onSearch }: SearchBarProps) => {
+  const [query, setQuery] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(query);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex gap-3 mb-6">
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search shops, products, categories…"
+        className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-400"
+      />
+      <button
+        type="submit"
+        className="px-6 py-2 bg-gray-900 text-white rounded-xl text-sm hover:bg-gray-800"
+      >
+        Search
+      </button>
+    </form>
   );
 };

@@ -3,33 +3,31 @@ interface CategoryPillsProps {
   onSelect: (category: string) => void;
 }
 
-const categories = [
-  'All',
-  'Fashion',
-  'Electronics',
-  'Food & Groceries',
-  'Beauty',
-  'Home & Living',
-  'Health',
-  'Art & Crafts'
-];
-
 export const CategoryPills = ({ selectedCategory, onSelect }: CategoryPillsProps) => {
+  const categories = [
+    'All',
+    'Fashion',
+    'Electronics',
+    'Food & Groceries',
+    'Beauty & Wellness',
+    'Home & Living',
+    'Art & Crafts',
+    'Health'
+  ];
+
   return (
-    <div className="flex gap-2 mb-5 flex-wrap">
-      {categories.map((category) => (
+    <div className="flex gap-2 overflow-x-auto py-2 mb-4">
+      {categories.map(cat => (
         <button
-          key={category}
-          onClick={() => onSelect(category)}
-          className={`
-            px-4 py-1.5 rounded-full border text-sm cursor-pointer transition-all duration-150
-            ${selectedCategory === category
-              ? 'bg-gray-900 text-white border-gray-900'
-              : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-            }
-          `}
+          key={cat}
+          onClick={() => onSelect(cat)}
+          className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
+            selectedCategory === cat
+              ? 'bg-gray-900 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
         >
-          {category}
+          {cat}
         </button>
       ))}
     </div>
