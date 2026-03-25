@@ -56,7 +56,7 @@ export const Hero = () => {
             onClick={() => navigate('/dashboard')}
             className="px-5 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50"
           >
-            Open a Shop
+            My Shop
           </button>
         </div>
       </div>

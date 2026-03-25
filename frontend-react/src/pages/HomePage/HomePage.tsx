@@ -10,7 +10,7 @@ export const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="pages_container">
       <Hero />
       <SearchBar onSearch={setSearchQuery} />
       <CategoryPills 

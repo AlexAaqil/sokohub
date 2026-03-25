@@ -67,7 +67,7 @@ export const ShopPage = () => {
     : products;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-16 py-6">
+    <div className="pages_container">
       {/* Back button */}
       <button
         onClick={() => navigate('/')}
